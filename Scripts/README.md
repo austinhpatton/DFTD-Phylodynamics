@@ -31,3 +31,9 @@ This script pulls out target genes from the somatic consensus sequences for each
 - calls the two Murray et al. scripts, and summarized the extent of clock-like signal for each gene - called by Test-ClockSignal.slurm to be run on a cluster. 
 #### 15) Test-ClockSignal.slurm 
 - Script to submit Test-ClockLike-Signal.Rscript to be run on a cluster. 
+#### 16) BDSKY-Analysis.R 
+- Rscript to analyze/summarize/plot the output from a BDSKY analysis. Current example is for summarizing results for Cluster 2. 
+#### 17) cbSKY-Analysis.R
+- Rscript to analyze/summarize/plot the output from the cbSKY analysis. 
+#### 18) Plot_pFst_Manhattan.R
+- Rscript to generate a formatted manhattan plot of per-site pFst. 
