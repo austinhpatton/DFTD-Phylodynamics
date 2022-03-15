@@ -1,0 +1,42 @@
+#!/usr/bin/Rscript
+
+library(lubridate)
+library(ape)
+
+slurm_arrayid <- Sys.getenv('SLURM_ARRAY_TASK_ID')
+n <- as.numeric(slurm_arrayid)
+
+fullset <- read.table('../FinishedTrees.txt', header = F)
+file <- as.character(fullset[n,])
+
+tree <- read.tree(paste0('../', file))
+tree$tip.label <- sub('_2', ':2', tree$tip.label)
+tips <- tree$tip.label
+
+dates <- c()
+for(i in 1:length(tips)){
+  date <- strsplit(tips[i], ':')[[1]][2]
+  dates[[i]] <- decimal_date(as.POSIXlt(date,
+                                      format="%Y_%m_%d"))
+}
+
+dates <- dates-min(dates)
+
+source('Murray-et-al-tempsignalfunctions.R')
+source('Murray-et-al-rand_regression.R')
+
+
+reg <- pathogen.regression(tree, dates, do.path.plot = F)
+reg.sig <- pathogen.permutation.test(tree, dates, nreps = 500, output.rooted.tree=F)
+
+Seq <- sub('GeneTrees/', '', file)
+Seq <- sub('-MSA-Mafft-FINAL.fa.treefile', '', Seq)
+res <- data.frame('File' = file,
+		  'Seq' = Seq,
+       		  'MRCA' = reg.sig$date_mrca,
+       		  'r' = reg.sig$r,
+       		  'rms' = reg.sig$rms,
+       		  'Pval' = reg.sig$p_value)
+
+write.table(x = res, file = paste0(Seq, '-ClockSignal.txt'), row.names=F)
+
